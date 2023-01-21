@@ -74,4 +74,9 @@ public interface IntermediateExecutableDTO extends BaseExecutableDTO {
     }
 
 
+    @Value.Lazy
+    default List<ArgumentDTO> getAllRequired(){
+        return getAllArguments().stream().filter(ArgumentDTO::isRequired).collect(Collectors.toList());
+    }
+
 }

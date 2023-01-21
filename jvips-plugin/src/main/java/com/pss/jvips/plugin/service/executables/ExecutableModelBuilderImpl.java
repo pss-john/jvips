@@ -22,9 +22,36 @@
 
 package com.pss.jvips.plugin.service.executables;
 
-public class ExecutableModelBuilderImpl {
+import com.pss.jvips.plugin.model.xml.executable.AbstractExecutable;
+import com.pss.jvips.plugin.model.xml.executable.Parameter;
+import com.pss.jvips.plugin.service.VersionedService;
+import com.pss.jvips.plugin.service.executables.arguments.ArgumentDTO;
+import com.pss.jvips.plugin.util.Utils;
+import org.apache.commons.collections4.MapUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class ExecutableModelBuilderImpl implements VersionedService {
+
+    // Parameter names that are out params that refer to size
+    public static final List<String> POSSIBLE_LENGTH_OR_SIZE = List.of("n", "length", "sizeof_type", "len", "size");
 
 
-    //public ExecutableDTO build()
+    public CombinedExecutableDTO build(AbstractExecutable executable, IntermediateExecutableDTO firstDto){
+        List<ArgumentDTO> arrayParams = new ArrayList<>();
+        List<ArgumentDTO> parameters = new ArrayList<>();
+
+        ImmutableCombinedExecutableDTO.Builder combined = ImmutableCombinedExecutableDTO.builder();
+        ImmutableExecutableDTO.Builder jni = ImmutableExecutableDTO.builder();
+        ImmutableExecutableDTO.Builder panama = ImmutableExecutableDTO.builder();
+
+        Map<String, Parameter> nativeCallParams = Utils.toLinkedHashMap(executable.getParameters(), Parameter::getName);
+        Map<String, ArgumentDTO> allRequired = Utils.toLinkedHashMap(firstDto.getAllRequired(), ArgumentDTO::getName);
+
+        return null;
+    }
 
 }

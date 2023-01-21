@@ -23,7 +23,7 @@
 package com.pss.jvips.plugin.model.dto.parameters;
 
 import com.pss.jvips.plugin.naming.JavaTypeMapping;
-import com.pss.jvips.plugin.out.OutParam;
+import com.pss.jvips.plugin.util.OutParam;
 import com.pss.jvips.plugin.context.GlobalPluginContext;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.MethodSpec;

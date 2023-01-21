@@ -23,8 +23,7 @@
 package com.pss.jvips.plugin.service.executables;
 
 import com.pss.jvips.plugin.service.executables.arguments.ArgumentDTO;
-import com.pss.jvips.plugin.service.executables.arguments.EarlyStageArgumentDTO;
-import com.pss.jvips.plugin.service.executables.arguments.OptionalArgumentDTO;
+import com.pss.jvips.plugin.service.executables.arguments.OptionalArgumentParameterDTO;
 import com.squareup.javapoet.ClassName;
 import org.immutables.value.Value;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +36,7 @@ public interface ExecutableDTO extends BaseExecutableDTO {
 
     List<ArgumentDTO> getAllRequiredExecutableArguments();
 
-    List<OptionalArgumentDTO> getAllOptionalExecutableArguments();
+    List<OptionalArgumentParameterDTO> getAllOptionalExecutableArguments();
 
     List<String> getImageParameterNames();
 
@@ -52,7 +51,7 @@ public interface ExecutableDTO extends BaseExecutableDTO {
     @Nullable
     ClassName getDtoClassName();
 
-    default Optional<OptionalArgumentDTO> getOptionalArgument(String name){
+    default Optional<OptionalArgumentParameterDTO> getOptionalArgument(String name){
         return getAllOptionalExecutableArguments().stream().filter(x-> x.getFormattedName().getNativeName().equals(name)).findFirst();
     }
 

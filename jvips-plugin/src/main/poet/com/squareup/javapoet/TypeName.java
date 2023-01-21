@@ -140,6 +140,30 @@ public class TypeName {
   }
 
   /**
+   * @since added to JVips
+   * @return true if instance of {@link ClassName}
+   */
+  public boolean isArray(){
+    return this instanceof ArrayTypeName;
+  }
+
+  /**
+   * @since added to JVips
+   * @return true if instance of {@link ClassName}
+   */
+  public boolean isClassName(){
+    return this instanceof ClassName;
+  }
+
+  /**
+   * @since added to JVips
+   * @return true if instance of {@link ParameterizedType}
+   */
+  public boolean isParameterizedType(){
+    return this instanceof ParameterizedType;
+  }
+
+  /**
    * Returns true if this is a boxed primitive type like {@code Integer}. Returns false for all
    * other types types including unboxed primitives and {@code java.lang.Void}.
    */

@@ -28,7 +28,7 @@ import com.pss.jvips.plugin.naming.JavaCaseFormat;
 import com.pss.jvips.plugin.naming.JavaNaming;
 import com.pss.jvips.plugin.naming.JavaTypeMapping;
 import com.pss.jvips.plugin.naming.Packages;
-import com.pss.jvips.plugin.out.OutParam;
+import com.pss.jvips.plugin.util.OutParam;
 import com.pss.jvips.plugin.util.Utils;
 import com.pss.jvips.plugin.context.GlobalPluginContext;
 import com.pss.jvips.plugin.context.OperationContext;

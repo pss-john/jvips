@@ -24,13 +24,11 @@ package com.pss.jvips.plugin.generation.impl.operations;
 
 import com.pss.jvips.plugin.model.dto.parameters.WritableParameter;
 import com.pss.jvips.plugin.model.xml.executable.AbstractExecutable;
-import com.pss.jvips.plugin.naming.Packages;
-import com.pss.jvips.plugin.out.OutParam;
+import com.pss.jvips.plugin.util.OutParam;
 import com.pss.jvips.plugin.util.Utils;
 import com.pss.jvips.plugin.context.GlobalPluginContext;
 import com.pss.jvips.plugin.context.OperationContext;
 import com.squareup.javapoet.*;
-import org.gradle.api.Task;
 
 import javax.lang.model.element.Modifier;
 import java.nio.file.Path;

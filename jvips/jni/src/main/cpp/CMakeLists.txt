@@ -45,5 +45,5 @@ link_directories(${VIPS_LIBRARY_DIRS})
 add_definitions(-DJAVA_LOG)
 include_directories(${VIPS_INCLUDE_DIRS})
 add_library(jvips_jni SHARED
-  jvips_VipsNative.cpp jvips_VipsNative.h ValueHandler.cpp ValueHandler.h jvips.h)
+  jvips_VipsNative.cpp jvips_VipsNative.h ValueHandler.cpp ValueHandler.h jvips.h utils.h utils.cpp)
 

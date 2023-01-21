@@ -34,7 +34,7 @@ import com.pss.jvips.plugin.model.xml.executable.AbstractExecutable;
 import com.pss.jvips.plugin.model.xml.executable.Parameter;
 import com.pss.jvips.plugin.model.xml.types.Direction;
 import com.pss.jvips.plugin.naming.JavaTypeMapping;
-import com.pss.jvips.plugin.out.OutParam;
+import com.pss.jvips.plugin.util.OutParam;
 import com.pss.jvips.plugin.util.MethodOptionalParametersDocumentation;
 import com.pss.jvips.plugin.util.Utils;
 import com.pss.jvips.plugin.context.GlobalPluginContext;

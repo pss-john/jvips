@@ -147,7 +147,7 @@ public class MemberRegistrationVisitor extends BaseTopLevelVisitor<GenerateVipsS
             List<WritableParameter> writableParams = new ArrayList<>();
 
             int i =  -1;
-            Parameter previous = null;
+
             for (Parameter parameter : executable.getParameters()) {
                 if(parameter.isExcluded()){
                     executable.setExclude(true);

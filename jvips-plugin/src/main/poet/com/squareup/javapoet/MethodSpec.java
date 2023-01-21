@@ -531,6 +531,15 @@ public final class MethodSpec {
       return this;
     }
 
+    /**
+     * @since Added to JVips
+     * @return builder
+     */
+    public Builder clearJavaDoc(){
+      javadoc.clear();
+      return this;
+    }
+
     public MethodSpec build() {
       return new MethodSpec(this);
     }

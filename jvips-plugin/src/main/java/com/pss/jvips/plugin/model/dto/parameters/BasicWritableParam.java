@@ -26,7 +26,7 @@ import com.pss.jvips.plugin.model.xml.executable.Parameter;
 import com.pss.jvips.plugin.model.xml.types.Direction;
 import com.pss.jvips.plugin.naming.JavaCaseFormat;
 import com.pss.jvips.plugin.naming.JavaTypeMapping;
-import com.pss.jvips.plugin.out.OutParam;
+import com.pss.jvips.plugin.util.OutParam;
 import com.pss.jvips.plugin.util.Utils;
 import com.pss.jvips.plugin.context.GlobalPluginContext;
 import com.squareup.javapoet.CodeBlock;

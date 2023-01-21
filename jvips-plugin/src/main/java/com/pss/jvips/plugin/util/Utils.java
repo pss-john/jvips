@@ -36,8 +36,13 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static com.pss.jvips.plugin.naming.JavaTypeMapping.JVipsImage_class;
 
@@ -234,4 +239,20 @@ public class Utils {
         int maxInt = max.ordinal();
         return inputInt == maxInt || (minInt <= inputInt && maxInt >= inputInt);
     }
+
+    public static <T, K, U> Collector<T, ?, Map<K,U>> toLinkedHashMap(Function<? super T, ? extends K> keyMapper) {
+        return Collectors.toMap(keyMapper, (v) -> (U) v, (u, u2) -> {
+            throw new RuntimeException("Same Key used for different Values was used: " + u + " and " + u2);
+        }, LinkedHashMap::new);
+    }
+
+
+    public static <K, V> Map<K,V> toLinkedHashMap(Collection<V> collection, Function<? super V, ? extends K> keyMapper) {
+        return collection.stream().collect(toLinkedHashMap(keyMapper));
+    }
+
+
+
+
+
 }
