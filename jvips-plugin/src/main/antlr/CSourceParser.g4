@@ -27,7 +27,7 @@ options {
 
 @parser::header {package com.pss.jvips.plugin.antlr;
 
-import com.pss.jvips.plugin.service.executables.arguments.ImmutableEarlyStageArgumentDTO;
+import com.pss.jvips.plugin.service.executables.arguments.ImmutableMacroArgumentDTO;
 }
 
 // Should probably use a visitor instead to cutdown on the noise!
@@ -102,7 +102,7 @@ argumentFlags: argumentFlag (BIT_OR argumentFlag)*;
 
 // argumentFlags: argumentFlag (BIT_OR argumentFlag)*;
 
-argCommon[ImmutableEarlyStageArgumentDTO.Builder arguments]:  IDENTIFIER COMMA
+argCommon[ImmutableMacroArgumentDTO.Builder arguments]:  IDENTIFIER COMMA
             name = stringLiteral COMMA
             INTEGER_LITERAL COMMA
             PARANS_OPEN_UNDERSCORE label = stringLiteral PARANS_CLOSE COMMA
@@ -113,7 +113,7 @@ argCommon[ImmutableEarlyStageArgumentDTO.Builder arguments]:  IDENTIFIER COMMA
                 IDENTIFIER
             PARANS_CLOSE ;
 
-argDouble[ImmutableEarlyStageArgumentDTO.Builder arguments]
+argDouble[ImmutableMacroArgumentDTO.Builder arguments]
     :
     VIPS_ARG_DOUBLE PARANS_OPEN
     argCommon[$arguments] COMMA
@@ -123,7 +123,7 @@ argDouble[ImmutableEarlyStageArgumentDTO.Builder arguments]
     PARANS_CLOSE
     SEMI_COLON;
 
-argInt[ImmutableEarlyStageArgumentDTO.Builder arguments]
+argInt[ImmutableMacroArgumentDTO.Builder arguments]
     :
     VIPS_ARG_INT PARANS_OPEN
     argCommon[$arguments] COMMA
@@ -134,7 +134,7 @@ argInt[ImmutableEarlyStageArgumentDTO.Builder arguments]
     SEMI_COLON;
 
 
-argBool[ImmutableEarlyStageArgumentDTO.Builder arguments]: VIPS_ARG_BOOL PARANS_OPEN
+argBool[ImmutableMacroArgumentDTO.Builder arguments]: VIPS_ARG_BOOL PARANS_OPEN
     argCommon[$arguments] COMMA
     defaultValue = IDENTIFIER //{$defText = $defaultValue.text;}
     PARANS_CLOSE
@@ -142,20 +142,20 @@ argBool[ImmutableEarlyStageArgumentDTO.Builder arguments]: VIPS_ARG_BOOL PARANS_
 
 // Enumes use the following macro format `VIPS_TYPE_INTENT` becomes identifier/ctype/glibtype = VipsIntent
 // and the name becomes `Intent`
-argEnum[ImmutableEarlyStageArgumentDTO.Builder arguments]: VIPS_ARG_ENUM PARANS_OPEN
+argEnum[ImmutableMacroArgumentDTO.Builder arguments]: VIPS_ARG_ENUM PARANS_OPEN
              argCommon[$arguments] COMMA
              type = IDENTIFIER COMMA
              defaultValue = IDENTIFIER
              PARANS_CLOSE
              SEMI_COLON;
 
-argImage[ImmutableEarlyStageArgumentDTO.Builder arguments]: VIPS_ARG_IMAGE PARANS_OPEN
+argImage[ImmutableMacroArgumentDTO.Builder arguments]: VIPS_ARG_IMAGE PARANS_OPEN
              argCommon[$arguments]
              PARANS_CLOSE
              SEMI_COLON;
 
 // Living dangerous here
-argUInt[ImmutableEarlyStageArgumentDTO.Builder arguments]
+argUInt[ImmutableMacroArgumentDTO.Builder arguments]
     :
     VIPS_ARG_UINT64 PARANS_OPEN
     argCommon[$arguments] COMMA
@@ -165,7 +165,7 @@ argUInt[ImmutableEarlyStageArgumentDTO.Builder arguments]
     PARANS_CLOSE
     SEMI_COLON;
 
-argString[ImmutableEarlyStageArgumentDTO.Builder arguments]: VIPS_ARG_STRING PARANS_OPEN
+argString[ImmutableMacroArgumentDTO.Builder arguments]: VIPS_ARG_STRING PARANS_OPEN
     argCommon[$arguments] COMMA
     defaultValue =  stringLiteralOrConstant
     PARANS_CLOSE
@@ -173,36 +173,36 @@ argString[ImmutableEarlyStageArgumentDTO.Builder arguments]: VIPS_ARG_STRING PAR
 
 
 
-argFlags[ImmutableEarlyStageArgumentDTO.Builder arguments]: VIPS_ARG_FLAGS PARANS_OPEN
+argFlags[ImmutableMacroArgumentDTO.Builder arguments]: VIPS_ARG_FLAGS PARANS_OPEN
          argCommon[$arguments] COMMA
          type = IDENTIFIER COMMA
          defaultValue = IDENTIFIER
          PARANS_CLOSE
          SEMI_COLON;
 
-argPointer[ImmutableEarlyStageArgumentDTO.Builder arguments]: VIPS_ARG_POINTER PARANS_OPEN
+argPointer[ImmutableMacroArgumentDTO.Builder arguments]: VIPS_ARG_POINTER PARANS_OPEN
              argCommon[$arguments]
              PARANS_CLOSE
              SEMI_COLON;
 
-argBoxed[ImmutableEarlyStageArgumentDTO.Builder arguments]: VIPS_ARG_BOXED PARANS_OPEN
+argBoxed[ImmutableMacroArgumentDTO.Builder arguments]: VIPS_ARG_BOXED PARANS_OPEN
     argCommon[$arguments] COMMA
     type = IDENTIFIER
     PARANS_CLOSE
     SEMI_COLON;
 
-argObject[ImmutableEarlyStageArgumentDTO.Builder arguments]: VIPS_ARG_OBJECT PARANS_OPEN
+argObject[ImmutableMacroArgumentDTO.Builder arguments]: VIPS_ARG_OBJECT PARANS_OPEN
     argCommon[$arguments] COMMA
     type = IDENTIFIER
     PARANS_CLOSE
     SEMI_COLON;
 
-argInterpolate[ImmutableEarlyStageArgumentDTO.Builder arguments]: VIPS_ARG_INTERPOLATE PARANS_OPEN
+argInterpolate[ImmutableMacroArgumentDTO.Builder arguments]: VIPS_ARG_INTERPOLATE PARANS_OPEN
     argCommon[$arguments]
     PARANS_CLOSE
     SEMI_COLON;
 
-args locals[ImmutableEarlyStageArgumentDTO.Builder arguments = ImmutableEarlyStageArgumentDTO.builder()]:
+args locals[ImmutableMacroArgumentDTO.Builder arguments = ImmutableMacroArgumentDTO.builder()]:
     argInt[$arguments]
     | argDouble[$arguments]
     | argBool[$arguments]

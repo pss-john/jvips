@@ -20,32 +20,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.pss.jvips.plugin.service.executables;
+package com.pss.jvips.plugin.service.executables.arguments;
 
-import com.pss.jvips.plugin.naming.FormattedName;
-import com.pss.jvips.plugin.naming.JavaCaseFormat;
-import com.squareup.javapoet.TypeName;
+import com.pss.jvips.plugin.service.executables.arguments.types.ArgumentMacro;
+import com.pss.jvips.plugin.service.executables.arguments.types.BaseArgument;
+import org.immutables.value.Value;
 
-import java.util.List;
+/**
+ * Contains the VipsOperation description from the Macros, why do we need this info? THe VipsOperation takes boxed
+ * arguments where as the a lot of the native C code takes regular types (ie: `void *buf` or `char *buf` and a length
+ * param) and it will construct the necessary boxed args like `VipsArrayDouble`
+ */
+@Value.Immutable
+public interface MacroArgumentDTO extends BaseArgument, ArgumentMacro {
 
-public interface BaseExecutableDTO extends FormattedName {
-    JavaCaseFormat getName();
-
-    TypeName getReturnType();
-
-    List<String> getNameTokens();
-
-    default boolean requiresWriteLock(){
-        return getNameTokens().contains("draw");
-    }
-
-
-    default boolean isSaveMethod(){
-        return getNameTokens().contains("save");
-    }
-
-
-    default boolean isLoadMethod(){
-        return getNameTokens().contains("load");
-    }
 }

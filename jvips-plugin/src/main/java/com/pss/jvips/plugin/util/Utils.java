@@ -23,9 +23,11 @@
 package com.pss.jvips.plugin.util;
 
 import com.google.common.base.Preconditions;
+import com.pss.jvips.plugin.context.OperationContext;
 import com.pss.jvips.plugin.context.Version;
 import com.pss.jvips.plugin.model.xml.executable.AbstractExecutable;
 import com.pss.jvips.plugin.model.xml.types.Direction;
+import com.pss.jvips.plugin.naming.JavaTypeMapping;
 import com.pss.jvips.plugin.service.VersionedService;
 import com.squareup.javapoet.*;
 import org.apache.commons.lang3.StringUtils;
@@ -252,7 +254,13 @@ public class Utils {
     }
 
 
-
-
+    public static TypeName getContextAwareReturnType(OperationContext context, TypeName rt){
+        if(rt instanceof ClassName cn){
+            if(JavaTypeMapping.REQUIRES_PARAMETERIZATION.contains(cn)){
+                return ParameterizedTypeName.get(cn, context.getImageType());
+            }
+        }
+        return rt;
+    }
 
 }

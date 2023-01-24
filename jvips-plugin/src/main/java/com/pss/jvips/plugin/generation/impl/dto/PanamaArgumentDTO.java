@@ -22,7 +22,7 @@
 
 package com.pss.jvips.plugin.generation.impl.dto;
 
-import com.pss.jvips.plugin.service.executables.arguments.EarlyStageArgumentDTO;
+import com.pss.jvips.plugin.service.executables.arguments.MacroArgumentDTO;
 import com.pss.jvips.plugin.antlr.early.old.EarlyStageOptionalParameter;
 import com.pss.jvips.plugin.antlr.csource.VisitedCodeBlock;
 import com.pss.jvips.plugin.model.xml.types.Direction;
@@ -107,7 +107,7 @@ public class PanamaArgumentDTO extends AbstractArgumentDTO {
 
                 TypeName original = t;
 
-                Optional<EarlyStageArgumentDTO> first = bl
+                Optional<MacroArgumentDTO> first = bl
                         .flatMap(y-> y.arguments().values().stream().filter(x -> x != null && x.getName().equals(parameter.nativeName()))
                                 .findFirst());
                 boolean isOut = first.map(x-> x.getDirection() == Direction.OUT).orElse(Boolean.FALSE);

@@ -20,19 +20,31 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.pss.jvips.plugin.service.executables.arguments;
+package com.pss.jvips.plugin.service.executables.arguments.types;
 
-import com.pss.jvips.plugin.antlr.csource.MacroType;
-import com.pss.jvips.plugin.antlr.csource.ValueHolder;
 import com.pss.jvips.plugin.model.xml.types.Direction;
 import com.pss.jvips.plugin.naming.JavaCaseFormat;
 import com.squareup.javapoet.TypeName;
-import org.immutables.value.Value;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
 
-@Value.Immutable
-public interface EarlyStageArgumentDTO extends ArgumentDTO {
+public interface BaseArgument {
+
+    TypeName getType();
+
+    JavaCaseFormat getFormattedName();
+
+    String getName();
+
+    boolean isImage();
+
+    boolean isDeprecated();
+
+    boolean isRequired();
+
+    Direction getDirection();
+
+    default int getArgumentCount(){
+        return 1;
+    }
 
 }

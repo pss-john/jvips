@@ -98,6 +98,9 @@ public class JavaTypeMapping  {
     public static final ClassName JVipsBlob_class = ClassName.get(Packages.Common.image, "JVipsBlob");
     public static final ClassName JVipsObject_class = ClassName.get(Packages.Common.data, "JVipsObject");
     public static final ClassName JVipsTarget_class = ClassName.get(Packages.Common.data, "JVipsTarget");
+
+    public static final List<TypeName> REQUIRES_PARAMETERIZATION = List.of(JVipsImage_class, JVipsBlob_class, JVipsArea_class);
+
     public static final ClassName JVipsObjectClass_class = ClassName.get(Packages.Common.data, "JVipsObjectClass");
     public static final ParameterizedTypeName JVipsImage_T_class = ParameterizedTypeName.get(JVipsImage_class, DataType_TypeVariable);
     public static final ParameterizedTypeName JVipsImage_Long_class = ParameterizedTypeName.get(JVipsImage_class, Long_class);

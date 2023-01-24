@@ -25,18 +25,30 @@ package com.pss.jvips.plugin.service.types;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import com.pss.jvips.plugin.model.xml.type.AbstractNativeType;
+import com.pss.jvips.plugin.model.xml.type.NativeArrayType;
+import com.pss.jvips.plugin.model.xml.type.NativeType;
 import com.pss.jvips.plugin.naming.JavaCaseFormat;
+import com.pss.jvips.plugin.naming.JavaTypeMapping;
 import com.pss.jvips.plugin.util.History;
 import com.pss.jvips.plugin.util.Utils;
+import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.pss.jvips.plugin.naming.JavaTypeMapping.*;
 
 public class TypeMappingService {
+
+    private static final Logger log = LoggerFactory.getLogger(TypeMappingService.class);
 
     protected final Table<SymbolTypes, String, History<TypeName>> symbolTypes = HashBasedTable.create();
 
@@ -90,5 +102,34 @@ public class TypeMappingService {
             throw new RuntimeException("Nothing for " + type + " were found");
         }
         throw new RuntimeException("To many instances of " + type + " were found");
+    }
+
+    public History<TypeName> getType(AbstractNativeType type){
+        if(type instanceof NativeArrayType at){
+
+            String name = Optional
+                    .ofNullable(at.getComponentType()).map(NativeType::getName)
+                    .or(()->
+                            Optional.ofNullable(at.getComponentType())
+                                    .map(AbstractNativeType::getType))
+                    .orElse("");
+            TypeName ttype = getType(name).target();
+
+            if(ttype.isPrimitive()){
+                if(TypeName.DOUBLE.equals(ttype)){
+                    return new History<>(ArrayTypeName.of(TypeName.DOUBLE));
+                } else if(TypeName.INT.equals(ttype)){
+                    return new History<>(ArrayTypeName.of(TypeName.INT));
+                }
+                return new History<>(ClassName.get(ByteBuffer.class));
+            }
+            return new History<>(ArrayTypeName.of(ttype));
+        } else if(type instanceof NativeType c) {
+            String name = Optional.ofNullable(c.getName()).or(()-> Optional.of(c.getType())).orElse("");
+            return getType(name);
+        } else {
+            log.warn("Call to constructType() getting type was null, return java.lang.Object");
+            return new History<>(TypeName.OBJECT);
+        }
     }
 }

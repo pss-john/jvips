@@ -1,6 +1,18 @@
 package com.pss.jvips.plugin.service.executables;
 
+import com.pss.jvips.plugin.context.OperationContext;
+import com.pss.jvips.plugin.naming.JavaTypeMapping;
+import com.pss.jvips.plugin.service.executables.arguments.IntrospectedArgumentDTO;
+import com.pss.jvips.plugin.service.executables.arguments.OptionalArgumentDTO;
+import com.pss.jvips.plugin.util.Utils;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
 import org.immutables.value.Value;
+import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.ParameterizedType;
+import java.util.List;
 
 /**
  * The method signature for calling directly via FFI vs Operation Introspection differ, example:
@@ -84,11 +96,31 @@ import org.immutables.value.Value;
  *
  */
 @Value.Immutable
-public interface CombinedExecutableDTO {
+public interface CombinedExecutableDTO extends BaseExecutableDTO {
 
-    ExecutableDTO getPanama();
 
-    ExecutableDTO getJni();
 
-    ExecutableDTO getJavaMethodSignature();
+    OperationContext getContext();
+
+    List<IntrospectedArgumentDTO> getCallParameters();
+
+    @Nullable
+    OptionalArgumentDTO<?> getOptionalArgument();
+
+    default TypeName getContextAwareReturnType(){
+        return Utils.getContextAwareReturnType(getContext(), getReturnType());
+    }
+
+
+    default TypeName getContextAwareFullCallSignature(){
+        var rt = getReturnType();
+        if(rt instanceof ClassName cn){
+            if(JavaTypeMapping.REQUIRES_PARAMETERIZATION.contains(cn)){
+                return ParameterizedTypeName.get(cn, getContext().getImageType());
+            }
+        }
+        return rt;
+    }
+
+
 }

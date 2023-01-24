@@ -176,13 +176,21 @@ public class CSourceListener extends CSourceParserBaseListener {
     public void exitArgBoxed(CSourceParser.ArgBoxedContext ctx) {
         if("VIPS_TYPE_ARRAY_DOUBLE".equals(ctx.type.getText())){
             ctx.arguments.type(JavaTypeMapping.Double_Array);
+            ctx.arguments.macroType(MacroType.BOXED_DOUBLE);
         } else if("VIPS_TYPE_ARRAY_INT".equals(ctx.type.getText())){
             ctx.arguments.type(JavaTypeMapping.Int_Array);
+            ctx.arguments.macroType(MacroType.BOXED_INTEGER);
         } else if("VIPS_TYPE_ARRAY_IMAGE".equals(ctx.type.getText())){
             ctx.arguments.type(JavaTypeMapping.VipsImage_Array_class);
             ctx.arguments.isImage(true);
+            ctx.arguments.macroType(MacroType.BOXED_IMAGE);
+        } else if("VIPS_TYPE_BLOB".equals(ctx.type.getText())){
+            ctx.arguments.type(JavaTypeMapping.ByteBuffer_class);
+            ctx.arguments.macroType(MacroType.BOXED_BLOB);
+        } else {
+            throw new RuntimeException("Unrecognized VIPS_ARG_BOXED type : " + ctx.type.getText());
         }
-        ctx.arguments.macroType(MacroType.BOXED);
+
     }
 
     @Override

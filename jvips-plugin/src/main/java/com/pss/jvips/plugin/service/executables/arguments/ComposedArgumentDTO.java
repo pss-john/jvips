@@ -22,27 +22,36 @@
 
 package com.pss.jvips.plugin.service.executables.arguments;
 
-import com.pss.jvips.plugin.antlr.csource.MacroType;
-import com.pss.jvips.plugin.antlr.csource.ValueHolder;
 import com.pss.jvips.plugin.model.xml.types.Direction;
 import com.pss.jvips.plugin.naming.JavaCaseFormat;
+import com.pss.jvips.plugin.service.executables.arguments.types.IntrospectedArgument;
 import com.squareup.javapoet.TypeName;
 import org.immutables.value.Value;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 
+/**
+ * Contains native arguments attached to length parameter
+ *
+ * .Example
+ * [source,C]
+ * ----
+ * int vips_some_operation(double *a, double *b, int length, ...){
+ * ----
+ *
+ * .Will result in this kind of structure
+ * [source]
+ * ----
+ * ComposedArgumentDTO(name: 'length', composed: [IntrospectedArgumentDTO(name: a), IntrospectedArgumentDTO(name: b)])
+ * ----
+ */
 @Value.Immutable
-public interface ComposedArgumentDTO extends ArgumentDTO {
+public interface ComposedArgumentDTO extends IntrospectedArgumentDTO {
 
-    ArgumentDTO getArgumentDTO();
+    IntrospectedArgumentDTO getArgumentDTO();
 
-    List<ArgumentDTO> getComposed();
-
-    default MacroType getMacroType() {
-        return getArgumentDTO().getMacroType();
-    }
+    List<IntrospectedArgumentDTO> getComposed();
 
     default TypeName getType() {
         return getArgumentDTO().getType();
@@ -59,38 +68,6 @@ public interface ComposedArgumentDTO extends ArgumentDTO {
 
     default String getName() {
         return getArgumentDTO().getName();
-    }
-
-    default String getLabel() {
-        return getArgumentDTO().getLabel();
-    }
-
-    default String getDescription() {
-        return getArgumentDTO().getDescription();
-    }
-
-    default @Nullable ValueHolder getDefaultValue() {
-        return getArgumentDTO().getDefaultValue();
-    }
-
-    default @Nullable ValueHolder getMinValue() {
-        return getArgumentDTO().getMinValue();
-    }
-
-    default @Nullable ValueHolder getMaxValue() {
-        return getArgumentDTO().getMaxValue();
-    }
-
-    default Optional<ValueHolder> defaultValue() {
-        return getArgumentDTO().defaultValue();
-    }
-
-    default Optional<ValueHolder> minValue() {
-        return getArgumentDTO().minValue();
-    }
-
-    default Optional<ValueHolder> maxValue() {
-        return getArgumentDTO().maxValue();
     }
 
     default boolean isImage() {

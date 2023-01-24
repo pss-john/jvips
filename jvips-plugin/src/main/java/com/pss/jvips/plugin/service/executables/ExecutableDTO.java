@@ -22,7 +22,7 @@
 
 package com.pss.jvips.plugin.service.executables;
 
-import com.pss.jvips.plugin.service.executables.arguments.ArgumentDTO;
+import com.pss.jvips.plugin.service.executables.arguments.types.BaseArgument;
 import com.pss.jvips.plugin.service.executables.arguments.OptionalArgumentParameterDTO;
 import com.squareup.javapoet.ClassName;
 import org.immutables.value.Value;
@@ -34,7 +34,7 @@ import java.util.Optional;
 @Value.Immutable
 public interface ExecutableDTO extends BaseExecutableDTO {
 
-    List<ArgumentDTO> getAllRequiredExecutableArguments();
+    List<BaseArgument> getAllRequiredExecutableArguments();
 
     List<OptionalArgumentParameterDTO> getAllOptionalExecutableArguments();
 
@@ -55,7 +55,7 @@ public interface ExecutableDTO extends BaseExecutableDTO {
         return getAllOptionalExecutableArguments().stream().filter(x-> x.getFormattedName().getNativeName().equals(name)).findFirst();
     }
 
-    default Optional<ArgumentDTO> getRequiredArgument(String name){
+    default Optional<BaseArgument> getRequiredArgument(String name){
         return getAllRequiredExecutableArguments().stream().filter(x-> x.getFormattedName().getNativeName().equals(name)).findFirst();
     }
 }

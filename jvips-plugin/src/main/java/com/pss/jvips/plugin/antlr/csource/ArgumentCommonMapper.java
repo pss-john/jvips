@@ -22,8 +22,9 @@
 
 package com.pss.jvips.plugin.antlr.csource;
 
-import com.pss.jvips.plugin.service.executables.arguments.EarlyStageArgumentDTO;
-import com.pss.jvips.plugin.service.executables.arguments.ImmutableEarlyStageArgumentDTO;
+import com.pss.jvips.plugin.service.executables.arguments.ImmutableMacroArgumentDTO;
+import com.pss.jvips.plugin.service.executables.arguments.MacroArgumentDTO;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -34,11 +35,11 @@ public interface ArgumentCommonMapper {
 
     ArgumentCommonMapper instance = Mappers.getMapper(ArgumentCommonMapper.class);
 
-    default EarlyStageArgumentDTO map(EarlyStageArgumentDTO common) {
-        return ImmutableEarlyStageArgumentDTO.copyOf(common);
+    default MacroArgumentDTO map(MacroArgumentDTO common) {
+        return ImmutableMacroArgumentDTO.copyOf(common);
     }
 
-    Map<String, EarlyStageArgumentDTO> map(Map<String, EarlyStageArgumentDTO> map);
+    Map<String, MacroArgumentDTO> map(Map<String, MacroArgumentDTO> map);
 
     default VisitedCodeBlock visitedBlock(VisitedCodeBlock block){
         return new VisitedCodeBlock(block.nickname(), block.description(), map(block.arguments()));

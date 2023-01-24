@@ -37,6 +37,7 @@ import static com.pss.jvips.plugin.naming.JavaTypeMapping.*;
 public enum OperationContext {
     COMMON(DataType_TypeVariable, UnderlyingSession_TypeVariable, "", new Packages.Common.Generated(), CommonConfig.class),
     JNI(Long_class, VOID, "Jni", new Packages.Jni.Generated(), JniConfig.class),
+    JNI_BYTE_BUFFER(ByteBuffer_class, VOID, "Jni", new Packages.Jni.Generated(), JniConfig.class),
     PANAMA(MemorySegment_class, MemorySession_class, "Panama", new Packages.Panama.Generated(), PanamaConfig.class);
 
     private final ParameterizedTypeName image;

@@ -22,8 +22,8 @@
 
 package com.pss.jvips.plugin.service.executables;
 
-import com.pss.jvips.plugin.service.executables.arguments.ArgumentDTO;
-import com.pss.jvips.plugin.service.executables.arguments.EarlyStageArgumentDTO;
+import com.pss.jvips.plugin.service.executables.arguments.MacroArgumentDTO;
+import com.pss.jvips.plugin.service.executables.arguments.types.BaseArgument;
 import com.pss.jvips.plugin.antlr.csource.MacroType;
 import com.pss.jvips.plugin.model.xml.types.Direction;
 import org.immutables.value.Value;
@@ -32,51 +32,51 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Value.Immutable
-public interface IntermediateExecutableDTO extends BaseExecutableDTO {
+public interface MacroExecutableDTO extends BaseExecutableDTO {
 
 
 
-    List<ArgumentDTO> getAllArguments();
+    List<MacroArgumentDTO> getAllArguments();
 
     @Value.Lazy
-    default List<ArgumentDTO> getNonDeprecatedArguments(){
+    default List<MacroArgumentDTO> getNonDeprecatedArguments(){
         return getAllArguments().stream().filter(x-> !x.isDeprecated()).collect(Collectors.toList());
     }
 
     @Value.Lazy
-    default List<ArgumentDTO> getRequiredInput(){
+    default List<MacroArgumentDTO> getRequiredInput(){
         return getNonDeprecatedArguments().stream().filter(x-> x.isRequired() && x.getDirection() == Direction.IN).collect(Collectors.toList());
     }
 
     @Value.Lazy
-    default List<ArgumentDTO> getOptionalInput(){
+    default List<MacroArgumentDTO> getOptionalInput(){
         return getNonDeprecatedArguments().stream().filter(x-> !x.isRequired() && x.getDirection() == Direction.IN).collect(Collectors.toList());
     }
 
     @Value.Lazy
-    default List<ArgumentDTO> getRequiredOutput(){
+    default List<MacroArgumentDTO> getRequiredOutput(){
         return getNonDeprecatedArguments().stream().filter(x-> x.isRequired() && x.getDirection() == Direction.OUT).collect(Collectors.toList());
     }
 
     @Value.Lazy
-    default List<ArgumentDTO> getOptionalOutput(){
+    default List<MacroArgumentDTO> getOptionalOutput(){
         return getNonDeprecatedArguments().stream().filter(x-> !x.isRequired() && x.getDirection() == Direction.OUT).collect(Collectors.toList());
     }
 
     @Value.Lazy
-    default List<ArgumentDTO> getImageInput(){
+    default List<MacroArgumentDTO> getImageInput(){
         return getRequiredInput().stream().filter(s-> s.isImage() && s.getMacroType() == MacroType.IMAGE).collect(Collectors.toList());
     }
 
     @Value.Lazy
-    default List<ArgumentDTO> getImageArrayInput(){
-        return getRequiredInput().stream().filter(s-> s.isImage() && s.getMacroType() == MacroType.BOXED).collect(Collectors.toList());
+    default List<MacroArgumentDTO> getImageArrayInput(){
+        return getRequiredInput().stream().filter(s-> s.isImage() && s.getMacroType() == MacroType.BOXED_IMAGE).collect(Collectors.toList());
     }
 
 
     @Value.Lazy
-    default List<ArgumentDTO> getAllRequired(){
-        return getAllArguments().stream().filter(ArgumentDTO::isRequired).collect(Collectors.toList());
+    default List<MacroArgumentDTO> getAllRequired(){
+        return getAllArguments().stream().filter(BaseArgument::isRequired).collect(Collectors.toList());
     }
 
 }

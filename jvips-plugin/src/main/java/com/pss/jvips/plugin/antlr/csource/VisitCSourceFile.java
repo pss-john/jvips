@@ -24,7 +24,7 @@ package com.pss.jvips.plugin.antlr.csource;
 
 import com.pss.jvips.plugin.antlr.CSourceParser;
 import com.pss.jvips.plugin.antlr.CSourceParserBaseVisitor;
-import com.pss.jvips.plugin.service.executables.arguments.EarlyStageArgumentDTO;
+import com.pss.jvips.plugin.service.executables.arguments.MacroArgumentDTO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,10 +85,10 @@ public class VisitCSourceFile extends CSourceParserBaseVisitor<List<VisitedCodeB
 
             }
             if(fileName.contains("save")){
-                Map<String, EarlyStageArgumentDTO> save = FOREIGN.get("save").arguments();
+                Map<String, MacroArgumentDTO> save = FOREIGN.get("save").arguments();
                 blocks.forEach(x-> x.arguments().putAll(save));
             } else if(fileName.contains("load")){
-                Map<String, EarlyStageArgumentDTO> save = FOREIGN.get("load").arguments();
+                Map<String, MacroArgumentDTO> save = FOREIGN.get("load").arguments();
                 blocks.forEach(x-> x.arguments().putAll(save));
             }
 
@@ -115,7 +115,7 @@ public class VisitCSourceFile extends CSourceParserBaseVisitor<List<VisitedCodeB
         var nickname = Optional.ofNullable(ctx.vobjectNickname().stringLiteral()).map(x->x.sb.toString()).orElse("");
         var description = Optional.ofNullable(ctx.vobjectDescription()).map(x-> x.stringLiteral()).map(x->x.sb.toString()).orElse("");
         if(CollectionUtils.isNotEmpty(ctx.args())){
-            var arguments = ctx.args().stream().map(x-> (EarlyStageArgumentDTO) x.arguments.build()).collect(Collectors.toMap(x-> x.getFormattedName().getJavaName(), x-> x)); // This needs to be mutable
+            var arguments = ctx.args().stream().map(x-> (MacroArgumentDTO) x.arguments.build()).collect(Collectors.toMap(x-> x.getFormattedName().getJavaName(), x-> x)); // This needs to be mutable
             blocks.add(new VisitedCodeBlock(nickname, description, arguments));
         } else {
             blocks.add(new VisitedCodeBlock(nickname, description, new HashMap<>())); // This needs to be mutable

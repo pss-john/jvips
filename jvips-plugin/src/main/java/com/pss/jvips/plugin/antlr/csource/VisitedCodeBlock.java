@@ -22,7 +22,7 @@
 
 package com.pss.jvips.plugin.antlr.csource;
 
-import com.pss.jvips.plugin.service.executables.arguments.EarlyStageArgumentDTO;
+import com.pss.jvips.plugin.service.executables.arguments.MacroArgumentDTO;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -94,10 +94,10 @@ public class VisitedCodeBlock {
     private final String nickname;
     private final String description;
     // MUST BE MUTABLE
-    private final Map<String, EarlyStageArgumentDTO> arguments;
+    private final Map<String, MacroArgumentDTO> arguments;
 
     public VisitedCodeBlock(String nickname, String description,
-                     Map<String, EarlyStageArgumentDTO> arguments){
+                     Map<String, MacroArgumentDTO> arguments){
         this.nickname = nickname;
         this.description = description;
         this.arguments = new HashMap<>(arguments);
@@ -111,7 +111,7 @@ public class VisitedCodeBlock {
         return description;
     }
 
-    public Map<String, EarlyStageArgumentDTO> arguments(){
+    public Map<String, MacroArgumentDTO> arguments(){
         return arguments;
     }
 }

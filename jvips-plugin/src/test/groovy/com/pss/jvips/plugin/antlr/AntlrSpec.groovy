@@ -25,11 +25,10 @@ package com.pss.jvips.plugin.antlr
 import com.pss.jvips.plugin.antlr.csource.MacroType
 import com.pss.jvips.plugin.model.xml.types.Direction
 import com.pss.jvips.plugin.naming.ImmutableJavaCaseFormat
-import com.pss.jvips.plugin.naming.JavaCaseFormat
 import com.pss.jvips.plugin.service.constants.ConstantsService
 import com.pss.jvips.plugin.service.executables.ExecutableDTO
 import com.pss.jvips.plugin.service.executables.ImmutableExecutableDTO
-import com.pss.jvips.plugin.service.executables.arguments.ArgumentDTO
+import com.pss.jvips.plugin.service.executables.arguments.types.BaseArgument
 import com.pss.jvips.plugin.service.executables.arguments.ImmutableEarlyStageArgumentDTO
 import com.pss.jvips.plugin.service.executables.arguments.ImmutableOptionalArgumentDTO
 import com.pss.jvips.plugin.service.naming.method.MethodAndParameterNamingService
@@ -191,7 +190,7 @@ whole image and then shrinking later."""
         ConstantsService constantsService = Stub(ConstantsService)
         TypeMappingService mappingService = new TypeMappingService()
         ParserFactoryImpl factory = new ParserFactoryImpl(mappingService, namingService, constantsService)
-        ArgumentDTO dto1 = ImmutableEarlyStageArgumentDTO.builder()
+        BaseArgument dto1 = ImmutableEarlyStageArgumentDTO.builder()
             .name("any")
         .description("any")
         .direction(Direction.IN)
