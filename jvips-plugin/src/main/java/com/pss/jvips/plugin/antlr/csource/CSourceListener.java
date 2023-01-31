@@ -60,7 +60,7 @@ public class CSourceListener extends CSourceParserBaseListener {
         boolean output = CollectionUtils.containsAny(types, OUTPUT);
         boolean required = CollectionUtils.containsAny(types, REQUIRED);
         Preconditions.checkArgument(input ^ output);
-        ctx.arguments.formattedName(JavaNaming.parameterName((String) getString(ctx.name).value()))
+        ctx.arguments.name(JavaNaming.parameterName((String) getString(ctx.name).value()))
                 .description((String) getString(ctx.description).value())
                 .label((String) getString(ctx.label).value())
                 .direction(input ? Direction.IN : Direction.OUT)

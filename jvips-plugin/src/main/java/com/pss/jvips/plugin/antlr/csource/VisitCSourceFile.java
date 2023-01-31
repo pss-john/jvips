@@ -115,7 +115,7 @@ public class VisitCSourceFile extends CSourceParserBaseVisitor<List<VisitedCodeB
         var nickname = Optional.ofNullable(ctx.vobjectNickname().stringLiteral()).map(x->x.sb.toString()).orElse("");
         var description = Optional.ofNullable(ctx.vobjectDescription()).map(x-> x.stringLiteral()).map(x->x.sb.toString()).orElse("");
         if(CollectionUtils.isNotEmpty(ctx.args())){
-            var arguments = ctx.args().stream().map(x-> (MacroArgumentDTO) x.arguments.build()).collect(Collectors.toMap(x-> x.getFormattedName().getJavaName(), x-> x)); // This needs to be mutable
+            var arguments = ctx.args().stream().map(x-> (MacroArgumentDTO) x.arguments.build()).collect(Collectors.toMap(x-> x.getName().getJavaName(), x-> x)); // This needs to be mutable
             blocks.add(new VisitedCodeBlock(nickname, description, arguments));
         } else {
             blocks.add(new VisitedCodeBlock(nickname, description, new HashMap<>())); // This needs to be mutable

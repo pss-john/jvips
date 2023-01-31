@@ -14,6 +14,8 @@ public interface CompleteArgumentDTO extends IntrospectedArgumentDTO, ArgumentMa
 
     MacroArgumentDTO getMacro();
 
+    TypeName getNativeType();
+
     @Override
     default MacroType getMacroType() {
         return getMacro().getMacroType();
@@ -50,12 +52,7 @@ public interface CompleteArgumentDTO extends IntrospectedArgumentDTO, ArgumentMa
     }
 
     @Override
-    default JavaCaseFormat getFormattedName() {
-        return getMacro().getFormattedName();
-    }
-
-    @Override
-    default String getName() {
+    default JavaCaseFormat getName() {
         return getMacro().getName();
     }
 
@@ -78,5 +75,6 @@ public interface CompleteArgumentDTO extends IntrospectedArgumentDTO, ArgumentMa
     default Direction getDirection() {
         return getMacro().getDirection();
     }
+
 
 }

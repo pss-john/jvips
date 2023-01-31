@@ -22,32 +22,25 @@
 
 package com.pss.jvips.plugin.generation.impl.operations;
 
-import com.pss.jvips.plugin.context.GlobalPluginContext;
-import com.pss.jvips.plugin.context.OperationContext;
 import com.pss.jvips.plugin.model.dto.parameters.WritableParameter;
 import com.pss.jvips.plugin.model.xml.executable.AbstractExecutable;
-import com.pss.jvips.plugin.model.xml.types.Direction;
-import com.pss.jvips.plugin.service.executables.CombinedExecutableDTO;
-import com.pss.jvips.plugin.service.executables.arguments.CompleteArgumentDTO;
-import com.pss.jvips.plugin.util.Constants;
 import com.pss.jvips.plugin.util.OutParam;
 import com.pss.jvips.plugin.util.Utils;
+import com.pss.jvips.plugin.context.GlobalPluginContext;
+import com.pss.jvips.plugin.context.OperationContext;
 import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Modifier;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.pss.jvips.plugin.naming.JavaTypeMapping.*;
 import static com.pss.jvips.plugin.util.Constants.*;
 
-public class GenerateJniOperations extends OperationGenerator<OperationGenerator.OperationGeneratorContext> {
+public class GenerateJniOperationsOld extends OperationGeneratorOld<OperationGeneratorOld.OperationGeneratorContext> {
 
 
-    public GenerateJniOperations(Path task, GlobalPluginContext context) {
+    public GenerateJniOperationsOld(Path task, GlobalPluginContext context) {
         super(task, context, OperationContext.JNI);
     }
 
@@ -72,53 +65,17 @@ public class GenerateJniOperations extends OperationGenerator<OperationGenerator
     }
 
     @Override
-    protected List<Modifier> modifiers() {
-        return List.of(Modifier.PUBLIC);
-    }
-
-    @Override
-    protected void addExecutables(OperationGeneratorContext arguments, TypeSpec.Builder typeSpec,
-                                  CombinedExecutableDTO executable, MethodSpec.Builder methodSpec, OptionalType optionalType) {
-        List<CompleteArgumentDTO> requiredInput = executable.getRequiredInput();
-        List<CompleteArgumentDTO> requiredOutput = executable.getRequiredOutput();
-        CodeBlock inSize = switch (optionalType){
-            case NONE -> CodeBlock.of("$L", requiredInput.size() * 2);
-            case SINGLE -> {
-                if(executable.getOptionalArgument().getSingularArgument().getDirection() == Direction.IN){
-                    yield CodeBlock.of("($L + ($L == null ? 0 : 1)) * 2", requiredInput.size(), executable.getOptionalArgument().getSingularArgument().javaName());
-                } else {
-                    yield CodeBlock.of("$L", requiredInput.size() * 2);
-                }
-
-            }
-            case DTO -> CodeBlock.of("($L + ($L == null ? 0 : $L.getInSize())) * 2", requiredInput.size(), "arg", "arg");
-        };
-        CodeBlock outSize = switch (optionalType){
-            case NONE -> CodeBlock.of("$L", requiredOutput.size() * 2);
-            case SINGLE -> {
-                if(executable.getOptionalArgument().getSingularArgument().getDirection() == Direction.OUT){
-                    yield CodeBlock.of("($L + ($L == null ? 0 : 1)) * 2", requiredOutput.size(), executable.getOptionalArgument().getSingularArgument().javaName());
-                } else {
-                    yield CodeBlock.of("$L", requiredOutput.size() * 2);
-                }
-            }
-            case DTO -> CodeBlock.of("($L + ($L == null ? 0 : $L.getOutSize())) * 2", requiredOutput.size(), "arg", "arg");
-        };
-
-        var inArray = CodeBlock.of("Object[] $L = new Object[$L]", in$params, inSize);
-        var outArray = CodeBlock.of("Object[] $L = new Object[$L]", out$params, outSize);
-        List<String> lockNames = new ArrayList<>();
-        executable.getImageInput().forEach(x-> lockNames.add(x.javaName()));
-        executable.getImageArrayInput().forEach(x-> lockNames.add(x.javaName()));
+    protected Modifier[] modifiers() {
+        return new Modifier[]{Modifier.PUBLIC};
     }
 
 
     @Override
-    protected TypeSpec.Builder customize(TypeSpec.Builder typeSpec) {
-        return typeSpec.superclass(parameterizedOperationClass());
+    protected TypeSpec.Builder getTypeSpec(OperationGeneratorContext arguments) {
+        return super.getTypeSpec(arguments).superclass(parameterizedOperationClass());
     }
 
-
+    @Override
     protected void addConstructor(TypeSpec.Builder typeSpec) {
         typeSpec.addMethod(createSuperConstructor(Long_class, VOID).build());
         MethodSpec.Builder newImage = newFromFile();
@@ -229,5 +186,20 @@ public class GenerateJniOperations extends OperationGenerator<OperationGenerator
     }
 
 
+    @Override
+    protected void buildWithOutOptional(TypeSpec.Builder typeSpec, MethodSpec.Builder methodSpec, AbstractExecutable executable, List<WritableParameter> params, TypeName returnType) {
+        buildInternal(typeSpec, methodSpec, executable, params, returnType);
+    }
 
+    @Override
+    protected void buildWithSingularOptionalParam(TypeSpec.Builder typeSpec, MethodSpec.Builder methodSpec, AbstractExecutable executable, List<WritableParameter> params, TypeName returnType, ParameterSpec parameterSpec) {
+        methodSpec.addParameter(parameterSpec);
+        buildInternal(typeSpec, methodSpec, executable, params, returnType);
+    }
+
+    @Override
+    protected void buildWithDTOOptionalParam(TypeSpec.Builder typeSpec, MethodSpec.Builder methodSpec, AbstractExecutable executable, List<WritableParameter> params, TypeName returnType, ParameterSpec parameterSpec) {
+        methodSpec.addParameter(parameterSpec);
+        buildInternal(typeSpec, methodSpec, executable, params, returnType);
+    }
 }

@@ -25,12 +25,7 @@ package com.pss.jvips.plugin.antlr.early;
 import com.pss.jvips.plugin.antlr.DocReaderLexer;
 import com.pss.jvips.plugin.antlr.DocReaderParser;
 import com.pss.jvips.plugin.antlr.DocReaderParserBaseVisitor;
-import com.pss.jvips.plugin.constants.VipsConstant;
-import com.pss.jvips.plugin.naming.JavaNaming;
-import com.pss.jvips.plugin.naming.TypeRegistration;
 import com.pss.jvips.plugin.service.executables.ExecutableDTO;
-import com.pss.jvips.plugin.util.History;
-import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -40,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Objects;
 
 public class TextVisitor extends DocReaderParserBaseVisitor<CodeBlock.Builder> {
 
@@ -96,12 +90,12 @@ public class TextVisitor extends DocReaderParserBaseVisitor<CodeBlock.Builder> {
         executable.getOptionalArgument(text)
                                 .ifPresentOrElse(arg-> {
                                     if(executable.hasSingularOptionalParameter()){
-                                        codeBlock.add("{@code $L}", arg.getFormattedName().getJavaName());
+                                        codeBlock.add("{@code $L}", arg.getName().getJavaName());
                                     } else {
-                                        codeBlock.add("{@link $T#$L}", executable.getDtoClassName(), arg.getFormattedName().getJavaName());
+                                        codeBlock.add("{@link $T#$L}", executable.getDtoClassName(), arg.getName().getJavaName());
                                     }
                                 }, () -> {
-                                    String param = executable.getRequiredArgument(text).map(x-> x.getFormattedName().getJavaName()).orElse(text);
+                                    String param = executable.getRequiredArgument(text).map(x-> x.getName().getJavaName()).orElse(text);
                                     codeBlock.add("{@code $L}", param);
                                 });
 

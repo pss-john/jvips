@@ -23,17 +23,18 @@
 package com.pss.jvips.plugin.service.executables.arguments.types;
 
 import com.pss.jvips.plugin.model.xml.types.Direction;
+import com.pss.jvips.plugin.naming.FormattedName;
 import com.pss.jvips.plugin.naming.JavaCaseFormat;
 import com.squareup.javapoet.TypeName;
 
 
-public interface BaseArgument {
+public interface BaseArgument extends FormattedName {
 
     TypeName getType();
 
-    JavaCaseFormat getFormattedName();
+    JavaCaseFormat getName();
 
-    String getName();
+    //String getName();
 
     boolean isImage();
 

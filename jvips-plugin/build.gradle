@@ -1,6 +1,6 @@
 plugins {
     id 'groovy'
-   // id 'idea'
+    id 'idea'
     id 'java-gradle-plugin'
     id 'antlr'
 }
@@ -23,7 +23,7 @@ sourceSets {
             srcDirs += "${projectDir}/src/main/generated"
             srcDirs += "${projectDir}/src/main/purejin"
             srcDirs += "${projectDir}/src/main/poet"
-            srcDirs += "${buildDir}/generated/sources/annotationProcessor/java/main/"
+            srcDirs += "${buildDir}/generated/sources/annotationProcessor/java/main"
         }
     }
     test {
@@ -39,13 +39,13 @@ dependencies {
 
 
    // implementation fileTree('lib/purejin/.bach/out/main/modules'){include '*.jar'}
-
+    implementation group: 'org.immutables', name: 'value', version: '2.9.2'
+    annotationProcessor group: 'org.immutables', name: 'value', version: '2.9.2'
     implementation group: 'org.semver4j', name: 'semver4j', version: '4.1.1'
 
     runtimeOnly(gradleApi())
     gradleApi()
-    implementation group: 'org.immutables', name: 'value', version: '2.9.2'
-    annotationProcessor group: 'org.immutables', name: 'value', version: '2.9.2'
+
     implementation group: 'org.jetbrains', name: 'annotations', version: '23.0.0'
     implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
 

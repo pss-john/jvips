@@ -196,7 +196,7 @@ whole image and then shrinking later."""
         .direction(Direction.IN)
         .macroType(MacroType.INT)
         .type(TypeName.INT)
-        .formattedName(ImmutableJavaCaseFormat.builder().nativeName("shrink").javaName("shrink").build())
+        .getName(ImmutableJavaCaseFormat.builder().nativeName("shrink").javaName("shrink").build())
         .isDeprecated(false)
         .isImage(false)
         .isRequired(false)

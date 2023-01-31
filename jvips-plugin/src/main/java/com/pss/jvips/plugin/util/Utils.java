@@ -29,17 +29,17 @@ import com.pss.jvips.plugin.model.xml.executable.AbstractExecutable;
 import com.pss.jvips.plugin.model.xml.types.Direction;
 import com.pss.jvips.plugin.naming.JavaTypeMapping;
 import com.pss.jvips.plugin.service.VersionedService;
+import com.pss.jvips.plugin.service.executables.arguments.types.IntrospectedArgument;
 import com.squareup.javapoet.*;
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.intellij.lang.annotations.PrintFormat;
 
 import javax.lang.model.SourceVersion;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -254,7 +254,7 @@ public class Utils {
     }
 
 
-    public static TypeName getContextAwareReturnType(OperationContext context, TypeName rt){
+    public static TypeName getContextAwareType(OperationContext context, TypeName rt){
         if(rt instanceof ClassName cn){
             if(JavaTypeMapping.REQUIRES_PARAMETERIZATION.contains(cn)){
                 return ParameterizedTypeName.get(cn, context.getImageType());
@@ -263,4 +263,15 @@ public class Utils {
         return rt;
     }
 
+    public static void error(@PrintFormat String message, Object... params){
+        throw new RuntimeException(String.format(message, params));
+    }
+
+    public static void addDocumentation(IntrospectedArgument arg, ParameterSpec.Builder builder){
+        arg.documentation().ifPresent(builder::addJavadoc);
+    }
+
+    public static void addDocumentation(IntrospectedArgument arg, MethodSpec.Builder builder){
+        arg.documentation().ifPresent(builder::addJavadoc);
+    }
 }

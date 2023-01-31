@@ -42,7 +42,7 @@ import java.util.Set;
 import static com.pss.jvips.plugin.naming.JavaTypeMapping.*;
 import static com.pss.jvips.plugin.util.Constants.*;
 
-public class GeneratePanamaOperations extends OperationGenerator<OperationGenerator.OperationGeneratorContext> {
+public class GeneratePanamaOperations extends OperationGeneratorOld<OperationGeneratorOld.OperationGeneratorContext> {
 
     private static final String $session = "$session";
     private static final String $i = "$i";

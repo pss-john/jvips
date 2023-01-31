@@ -36,10 +36,10 @@ import com.pss.jvips.plugin.generation.impl.dto.JniArgumentDTO;
 import com.pss.jvips.plugin.generation.impl.dto.PanamaArgumentDTO;
 import com.pss.jvips.plugin.generation.impl.dto.factory.DTOFactoryServiceInterface;
 import com.pss.jvips.plugin.generation.impl.dto.factory.JniDTOFactoryServiceInterface;
-import com.pss.jvips.plugin.generation.impl.operations.GenerateAbstractOperations;
-import com.pss.jvips.plugin.generation.impl.operations.GenerateJniOperations;
+import com.pss.jvips.plugin.generation.impl.operations.GenerateAbstractOperationsOld;
+import com.pss.jvips.plugin.generation.impl.operations.GenerateJniOperationsOld;
 import com.pss.jvips.plugin.generation.impl.operations.GeneratePanamaOperations;
-import com.pss.jvips.plugin.generation.impl.operations.OperationGenerator;
+import com.pss.jvips.plugin.generation.impl.operations.OperationGeneratorOld;
 
 import com.pss.jvips.plugin.generation.impl.dto.factory.DTOTuple;
 
@@ -85,8 +85,8 @@ public class GenerateVipsSourcesAction implements Action<Task> {
 
     protected EnumCodeGenerator enumCodeGenerator;
     protected InterpolateGenerator interpolateGenerator;
-    protected GenerateJniOperations generateJniImplementation;
-    protected GenerateAbstractOperations generateAbstractOperations;
+    protected GenerateJniOperationsOld generateJniImplementation;
+    protected GenerateAbstractOperationsOld generateAbstractOperations;
     protected GeneratePanamaOperations generatePanamaOperations;
 
     protected ConstantGeneratorOld constantGenerator;
@@ -111,8 +111,8 @@ public class GenerateVipsSourcesAction implements Action<Task> {
         final Path path = task.getProject().getBuildDir().toPath();
         this.enumCodeGenerator = new EnumCodeGenerator(path, context);
         this.interpolateGenerator = new InterpolateGenerator(path, context);
-        this.generateJniImplementation = new GenerateJniOperations(path, context);
-        this.generateAbstractOperations = new GenerateAbstractOperations(path, context);
+        this.generateJniImplementation = new GenerateJniOperationsOld(path, context);
+        this.generateAbstractOperations = new GenerateAbstractOperationsOld(path, context);
         this.generatePanamaOperations = new GeneratePanamaOperations(path, context);
         this.jniArgumentDTO = new JniArgumentDTO(path, context);
         this.baseArgumentDTO = new BaseArgumentDTO(path, context);
@@ -269,7 +269,7 @@ public class GenerateVipsSourcesAction implements Action<Task> {
 
 
 
-        OperationGenerator.OperationGeneratorContext operationGeneratorContext = new OperationGenerator.OperationGeneratorContext(executableRegistration.getExecutables());
+        OperationGeneratorOld.OperationGeneratorContext operationGeneratorContext = new OperationGeneratorOld.OperationGeneratorContext(executableRegistration.getExecutables());
         switch (context.operationContext()){
             case COMMON -> generateAbstractOperations.run(operationGeneratorContext);
             case JNI -> generateJniImplementation.run(operationGeneratorContext);

@@ -25,11 +25,12 @@ package com.pss.jvips.plugin.service.executables;
 import com.pss.jvips.plugin.naming.FormattedName;
 import com.pss.jvips.plugin.naming.JavaCaseFormat;
 import com.squareup.javapoet.TypeName;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BaseExecutableDTO extends FormattedName {
-    JavaCaseFormat getName();
 
     TypeName getReturnType();
 
@@ -48,4 +49,13 @@ public interface BaseExecutableDTO extends FormattedName {
     default boolean isLoadMethod(){
         return getNameTokens().contains("load");
     }
+
+    @Nullable
+    String getDocumentation();
+
+    default Optional<String> documentation(){
+        return Optional.ofNullable(getDocumentation());
+    }
+
+    String getSourceFile();
 }

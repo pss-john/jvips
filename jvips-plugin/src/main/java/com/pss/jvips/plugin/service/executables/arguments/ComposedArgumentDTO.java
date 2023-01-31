@@ -24,7 +24,6 @@ package com.pss.jvips.plugin.service.executables.arguments;
 
 import com.pss.jvips.plugin.model.xml.types.Direction;
 import com.pss.jvips.plugin.naming.JavaCaseFormat;
-import com.pss.jvips.plugin.service.executables.arguments.types.IntrospectedArgument;
 import com.squareup.javapoet.TypeName;
 import org.immutables.value.Value;
 import org.jetbrains.annotations.Nullable;
@@ -57,8 +56,8 @@ public interface ComposedArgumentDTO extends IntrospectedArgumentDTO {
         return getArgumentDTO().getType();
     }
 
-    default JavaCaseFormat getFormattedName() {
-        return getArgumentDTO().getFormattedName();
+    default JavaCaseFormat getName() {
+        return getArgumentDTO().getName();
     }
 
     @Nullable
@@ -66,9 +65,9 @@ public interface ComposedArgumentDTO extends IntrospectedArgumentDTO {
         return getArgumentDTO().getDocumentation();
     }
 
-    default String getName() {
-        return getArgumentDTO().getName();
-    }
+//    default String getName() {
+//        return getArgumentDTO().getName();
+//    }
 
     default boolean isImage() {
         return getArgumentDTO().isImage();

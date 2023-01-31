@@ -474,6 +474,16 @@ public final class TypeSpec {
       return this;
     }
 
+    /**
+     * Add for JVips
+     * @param modifiers
+     * @return
+     */
+    public Builder addModifiers(List<Modifier> modifiers) {
+      this.modifiers.addAll(modifiers);
+      return this;
+    }
+
     public Builder addTypeVariables(Iterable<TypeVariableName> typeVariables) {
       checkArgument(typeVariables != null, "typeVariables == null");
       for (TypeVariableName typeVariable : typeVariables) {

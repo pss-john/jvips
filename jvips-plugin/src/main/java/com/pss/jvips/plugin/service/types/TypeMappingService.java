@@ -24,6 +24,8 @@ package com.pss.jvips.plugin.service.types;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Table;
 import com.pss.jvips.plugin.model.xml.type.AbstractNativeType;
 import com.pss.jvips.plugin.model.xml.type.NativeArrayType;
@@ -40,15 +42,17 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.pss.jvips.plugin.naming.JavaTypeMapping.*;
 
 public class TypeMappingService {
 
     private static final Logger log = LoggerFactory.getLogger(TypeMappingService.class);
+
+    protected final Set<ClassName> requiresGeneric = new HashSet<>();
+
+    protected final Map<ClassName, History<ClassName>> dtoTypes = new HashMap<>();
 
     protected final Table<SymbolTypes, String, History<TypeName>> symbolTypes = HashBasedTable.create();
 
@@ -93,6 +97,27 @@ public class TypeMappingService {
         symbolTypes.put(SymbolTypes.CONSTANT, name.getNativeName(), className);
     }
 
+    public void registerDtoClass(History<ClassName> className){
+        dtoTypes.put(className.target(), className);
+    }
+
+    public void registerGeneric(ClassName cn){
+        requiresGeneric.add(cn);
+    }
+
+
+    public boolean requiresGeneric(TypeName tn){
+        if(tn instanceof ClassName cn){
+            return requiresGeneric.contains(cn);
+        } else if(tn instanceof ArrayTypeName atn){
+            TypeName component = atn.componentType;
+            if(component instanceof ClassName cn){
+                return requiresGeneric.contains(cn);
+            }
+        }
+        return false;
+    }
+
     public History<TypeName> getType(String type){
         Preconditions.checkArgument(type != null);
         Map<SymbolTypes, History<TypeName>> column = symbolTypes.column(type);
@@ -132,4 +157,6 @@ public class TypeMappingService {
             return new History<>(TypeName.OBJECT);
         }
     }
+
+
 }

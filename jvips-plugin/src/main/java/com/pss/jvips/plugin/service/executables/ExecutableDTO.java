@@ -52,10 +52,10 @@ public interface ExecutableDTO extends BaseExecutableDTO {
     ClassName getDtoClassName();
 
     default Optional<OptionalArgumentParameterDTO> getOptionalArgument(String name){
-        return getAllOptionalExecutableArguments().stream().filter(x-> x.getFormattedName().getNativeName().equals(name)).findFirst();
+        return getAllOptionalExecutableArguments().stream().filter(x-> x.getName().getNativeName().equals(name)).findFirst();
     }
 
     default Optional<BaseArgument> getRequiredArgument(String name){
-        return getAllRequiredExecutableArguments().stream().filter(x-> x.getFormattedName().getNativeName().equals(name)).findFirst();
+        return getAllRequiredExecutableArguments().stream().filter(x-> x.getName().getNativeName().equals(name)).findFirst();
     }
 }

@@ -28,6 +28,7 @@ import com.pss.jvips.plugin.model.xml.types.Direction;
 import com.pss.jvips.plugin.naming.JavaCaseFormat;
 import com.pss.jvips.plugin.service.executables.arguments.types.ArgumentMacro;
 import com.pss.jvips.plugin.service.executables.arguments.types.BaseArgument;
+import com.pss.jvips.plugin.service.executables.arguments.types.IntrospectedArgument;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 import org.immutables.value.Value;
@@ -36,12 +37,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 @Value.Immutable
-public interface OptionalArgumentParameterDTO extends BaseArgument, ArgumentMacro {
+public interface OptionalArgumentParameterDTO extends BaseArgument, ArgumentMacro, IntrospectedArgument {
 
     @Nullable
     ClassName getClassName();
 
     MacroArgumentDTO getArgumentDTO();
+
 
 
     default MacroType getMacroType() {
@@ -52,14 +54,10 @@ public interface OptionalArgumentParameterDTO extends BaseArgument, ArgumentMacr
         return getArgumentDTO().getType();
     }
 
-    default JavaCaseFormat getFormattedName() {
-        return getArgumentDTO().getFormattedName();
-    }
-
-
-    default String getName() {
+    default JavaCaseFormat getName() {
         return getArgumentDTO().getName();
     }
+
 
     default String getLabel() {
         return getArgumentDTO().getLabel();

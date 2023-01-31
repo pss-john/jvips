@@ -22,26 +22,12 @@
 
 package com.pss.jvips.plugin.generation.impl.operations;
 
-import com.pss.jvips.plugin.antlr.ParserFactoryOld;
-import com.pss.jvips.plugin.antlr.csource.VisitedCodeBlock;
-import com.pss.jvips.plugin.generation.CodeGeneratorOld;
-import com.pss.jvips.plugin.generation.impl.RecordGenerator;
-import com.pss.jvips.plugin.model.dto.parameters.BasicWritableParam;
-import com.pss.jvips.plugin.model.dto.parameters.OptionalDTOParam;
-import com.pss.jvips.plugin.model.dto.parameters.OptionalParam;
-import com.pss.jvips.plugin.model.dto.parameters.WritableParameter;
-import com.pss.jvips.plugin.model.xml.executable.AbstractExecutable;
-import com.pss.jvips.plugin.model.xml.executable.Parameter;
-import com.pss.jvips.plugin.model.xml.types.Direction;
-import com.pss.jvips.plugin.naming.JavaTypeMapping;
-import com.pss.jvips.plugin.util.OutParam;
-import com.pss.jvips.plugin.util.MethodOptionalParametersDocumentation;
-import com.pss.jvips.plugin.util.Utils;
-import com.pss.jvips.plugin.context.GlobalPluginContext;
 import com.pss.jvips.plugin.context.OperationContext;
-import com.pss.jvips.plugin.context.ScopedPluginContext;
+import com.pss.jvips.plugin.generation.CodeGenerator;
+import com.pss.jvips.plugin.naming.JavaTypeMapping;
+import com.pss.jvips.plugin.service.executables.CombinedExecutableDTO;
+import com.pss.jvips.plugin.service.executables.arguments.*;
 import com.squareup.javapoet.*;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,75 +36,112 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static com.pss.jvips.plugin.naming.JavaTypeMapping.*;
+import static com.pss.jvips.plugin.util.Utils.addDocumentation;
+import static com.pss.jvips.plugin.util.Utils.error;
 
-public abstract class OperationGenerator<A extends OperationGenerator.OperationGeneratorContext> extends CodeGeneratorOld<A, TypeSpec> {
+public abstract class OperationGenerator<A extends OperationGenerator.OperationGeneratorContext> extends CodeGenerator<A> {
+
+    public enum OptionalType{NONE, SINGLE, DTO}
 
     private static final Logger log = LoggerFactory.getLogger(OperationGenerator.class);
 
-    protected final RecordGenerator recordGenerator;
+    protected final OperationContext context;
 
-    public OperationGenerator(Path task, GlobalPluginContext context, OperationContext operationContext) {
-        super(task, context, operationContext);
-        this.recordGenerator = new RecordGenerator(task, context);
+
+    public OperationGenerator(Path path, OperationContext context) {
+        super(path);
+        this.context = context;
     }
 
-    protected abstract ParameterizedTypeName parameterizedContextClass();
+    protected List<Modifier> modifiers(){
+        return List.of(Modifier.PUBLIC);
+    }
 
-    protected abstract ParameterizedTypeName parameterizedOperationClass();
+    protected TypeSpec.Builder customize(TypeSpec.Builder builder){
+        return builder;
+    }
 
-    protected abstract ParameterizedTypeName parameterizedImageClass();
+    protected TypeSpec.Builder getTypeSpec(A arguments, ClassName className) {
+        return customize(TypeSpec.classBuilder(className).addModifiers(modifiers()));
+    }
 
-    protected abstract ClassName className();
-
-    protected abstract Modifier[] modifiers();
 
     @Override
-    protected TypeSpec.Builder getTypeSpec(A arguments) {
-        return TypeSpec.classBuilder(className())
-                .addModifiers(modifiers());
-    }
-
-    protected boolean canAdd(AbstractExecutable executable){
-        return Objects.equals(executable.getIntrospectable(), Boolean.TRUE)
-                && !executable.isExclude()
-                && StringUtils.isNotEmpty(executable.getName());
-    }
-
-    @Override
-    protected final Result<TypeSpec> runInternal(TypeSpec.Builder typeSpec, A arguments) {
-        addConstructor(typeSpec);
-        for(var executable : arguments.getExecutables()){
-            if (canAdd(executable)) {
-                addExecutables(arguments, typeSpec, executable);
-            }
+    protected void runInternal(TypeSpec.Builder typeSpec, A arguments, ClassName className) {
+        addConstructorAndFields(typeSpec);
+        for (CombinedExecutableDTO executable : arguments.getExecutables()) {
+            addExecutables(arguments, typeSpec, executable);
         }
-        return new Result<>(typeSpec.build(), className());
     }
 
-    protected void addExecutables(A arguments, TypeSpec.Builder typeSpec, AbstractExecutable executable) {
-        MethodSpec.Builder method = MethodSpec.methodBuilder(executable.getJavaName().getJavaName())
+
+    protected abstract void addExecutables(A arguments, TypeSpec.Builder typeSpec, CombinedExecutableDTO executable,
+                                           MethodSpec.Builder methodSpec, OptionalType optionalType);
+
+    protected final void addExecutables(A arguments, TypeSpec.Builder typeSpec, CombinedExecutableDTO executable) {
+        log.debug("Entering Executable: {}", executable.getName());
+        MethodSpec.Builder method = MethodSpec
+                .methodBuilder(executable.javaName())
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(generateNativeAnnotationSpec(executable))
                 .addException(JavaTypeMapping.VipsException_class);
-        executable.documentation()
-                .ifPresent((String documentation) -> method.addJavadoc("$L", ParserFactoryOld.getMethodDoc(documentation, new ScopedPluginContext(context, executable, VipsOperations_class))));
-        List<WritableParameter> writableParams = executable.getWritableParams();
-        writableParams.forEach(x-> x.addParameters(method));
-        Set<OutParam> outParams = new LinkedHashSet<>();
-        writableParams.forEach(x-> x.registerOutParams(outParams));
-        TypeName returnType =  resolveReturnType(executable, writableParams);
-        method.returns(returnType);
-        customize(method);
-        if(context.isSingularOptionalParam(executable)){
-            buildWithSingularOptionalParam(typeSpec, method, executable, writableParams, returnType);
-        } else if(context.isDTOOptionalParam(executable)){
-            buildWithDTOOptionalParam(typeSpec, method, executable, writableParams, returnType);
-        } else {
-            buildWithOutOptional(typeSpec, method, executable, writableParams, returnType);
+
+        executable.documentation().ifPresent(method::addJavadoc);
+
+        for (IntrospectedArgumentDTO callParameter : executable.getCallParameters()) {
+            log.trace("Entering Executable: {}, param: {}", executable.nativeName(), callParameter.nativeName());
+            if(callParameter instanceof ComposedArgumentDTO cad){
+                for (IntrospectedArgumentDTO composed : cad.getComposed()) {
+                    if(composed instanceof CompleteArgumentDTO completed){
+                        addParameter(method, completed);
+                    } else {
+                        error("Error in executable: `%s(..%s...) argument inside of `%s` must be an instance of `%s`",
+                                executable.nativeName(), callParameter.nativeName(),
+                                ComposedArgumentDTO.class, CompleteArgumentDTO.class);
+                    }
+                }
+            } else if(callParameter instanceof CompleteArgumentDTO completed){
+                addParameter(method, completed);
+            } else {
+                error("Error in executable: `%s(..%s...) argument at build stage must be instance of : `%s` or `%s`",
+                        executable.nativeName(), callParameter.nativeName(),
+                        CompleteArgumentDTO.class, ComposedArgumentDTO.class);
+            }
         }
+
+        OptionalArgumentDTO optionalArgument = executable.getOptionalArgument();
+        if(optionalArgument != null){
+            if(optionalArgument.isSingular()){
+                OptionalArgumentParameterDTO argument = optionalArgument.getSingularArgument();
+                var param = ParameterSpec.builder(argument.getType(), argument.javaName())
+                        .addAnnotation(
+                                AnnotationSpec.builder(JavaTypeMapping.OptionalParameter_class)
+                                    .addMember("value", "$S", argument.nativeName())
+                                    .build()
+                        );
+                addDocumentation(argument, param);
+                method.addParameter(param.build());
+                addExecutables(arguments, typeSpec, executable, method, OptionalType.SINGLE);
+            } else {
+                var param = ParameterSpec.builder(optionalArgument.getType(), "arg")
+                        .addAnnotation(AnnotationSpec.builder(JavaTypeMapping.OptionalParameter_class).build());
+                addDocumentation(optionalArgument, param);
+                method.addParameter(param.build());
+                addExecutables(arguments, typeSpec, executable, method, OptionalType.DTO);
+            }
+        } else {
+            addExecutables(arguments, typeSpec, executable, method, OptionalType.NONE);
+        }
+        method.returns(executable.getResult().getType());
     }
 
-    protected void addConstructor(TypeSpec.Builder typeSpec){
+    private static void addParameter(MethodSpec.Builder method, CompleteArgumentDTO completed) {
+        var param = ParameterSpec.builder(completed.getType(), completed.javaName());
+        addDocumentation(completed, param);
+        method.addParameter(param.build());
+    }
+
+    protected void addConstructorAndFields(TypeSpec.Builder typeSpec){
 
     }
 
@@ -137,97 +160,21 @@ public abstract class OperationGenerator<A extends OperationGenerator.OperationG
                 .addStatement(body);
     }
 
-    protected TypeName resolveReturnType(AbstractExecutable executable, List<WritableParameter> params){
-        Set<OutParam> outParams = new LinkedHashSet<>();
-        params.forEach(param-> param.registerOutParams(outParams));
-        TypeName nativeReturnType = executable.getReturnValue().constructType();
-        if(outParams.size() == 0 && (TypeName.VOID.equals(nativeReturnType) || TypeName.INT.equals(nativeReturnType))){
-            return TypeName.VOID;
-        } else if(outParams.size() == 0){
-            log.info("Executable {} returns type: {}", executable.getName(), nativeReturnType);
-            return nativeReturnType;
-        } else if(outParams.size() == 1){
-            TypeName type = Utils.getFirst(outParams).type();
-            if(JavaTypeMapping.JVipsImage_class.equals(type)){
-                return parameterizedImageClass();
-            }
-            return type;
-        } else {
-            log.info("Executable returns the following: {}, generating a new class", outParams);
-            return recordGenerator.run(new RecordGenerator.RecordArgs(executable, outParams));
-        }
-    }
 
-    protected MethodSpec.Builder newFromFile(){
-        return MethodSpec.methodBuilder("newImageFromFile").addParameter(ParameterSpec.builder(String_class, "fileName").build()).addModifiers(Modifier.PUBLIC)
-                .addException(VipsException_class)
-                .returns(parameterizedImageClass());
-    }
 
     protected void customize(MethodSpec.Builder builder){
 
     }
 
-    protected abstract void buildWithOutOptional(TypeSpec.Builder typeSpec, MethodSpec.Builder methodSpec, AbstractExecutable executable, List<WritableParameter> params, TypeName returnType);
-
-    protected final void buildWithSingularOptionalParam(TypeSpec.Builder typeSpec, MethodSpec.Builder methodSpec, AbstractExecutable executable, List<WritableParameter> params, TypeName returnType){
-        MethodOptionalParametersDocumentation visitor = context.getSingularOptionalParam(executable);
-        Optional<VisitedCodeBlock> bl =  Optional.ofNullable(visitor.getSourceCodeVisited());
-        String firstParam1 =  Utils.getFirst(visitor.getOptionalParameters().keySet());
-        var firstParam =  Utils.getFirst(visitor.getOptionalParameters().values());
-        TypeName boxedType = Utils.toPerformantReferenceType(bl.map(x-> x.arguments().get(firstParam1)).map(x-> x.getType()).orElseGet(()->firstParam.getType().get()));
-
-        params.add(new OptionalParam(new BasicWritableParam(boxedType, Direction.IN, firstParam.getDocumentation().toString(), firstParam.getName(), context), context));
-        // Add optional Param to original method
-        ParameterSpec parameterSpec = ParameterSpec.builder(boxedType, firstParam.javaName())
-                .addAnnotation(
-                        AnnotationSpec.builder(JavaTypeMapping.OptionalParameter_class)
-                                .addMember("value", "$S", firstParam.nativeName())
-                                .build())
-                .build();
-        buildWithSingularOptionalParam(typeSpec, methodSpec, executable, params, returnType, parameterSpec);
-    }
-
-    protected abstract void buildWithSingularOptionalParam(TypeSpec.Builder typeSpec, MethodSpec.Builder methodSpec,
-                                                           AbstractExecutable executable, List<WritableParameter> params, TypeName returnType, ParameterSpec parameterSpec);
-
-    /**
-     * Do not add parameter to method spec {@link GenerateAbstractOperations#buildWithDTOOptionalParam(TypeSpec.Builder, MethodSpec.Builder, AbstractExecutable, List, TypeName, ParameterSpec)}
-     *
-     *
-     * @param typeSpec
-     * @param methodSpec
-     * @param executable
-     * @param params
-     * @param returnType
-     */
-    protected final void buildWithDTOOptionalParam(TypeSpec.Builder typeSpec, MethodSpec.Builder methodSpec, AbstractExecutable executable, List<WritableParameter> params, TypeName returnType) {
-        ClassName dto = context.getDtoOptionalParam(executable);
-        ParameterizedTypeName parameterizedDTO = ParameterizedTypeName.get(dto, context.operationContext().getDtoTypes());
-
-        params.add(new OptionalDTOParam(parameterizedDTO, context));
-
-        ParameterSpec parameterSpec = ParameterSpec.builder(parameterizedDTO , "args")
-                .addAnnotation(
-                        AnnotationSpec.builder(JavaTypeMapping.OptionalParameter_class)
-                                .build())
-                .build();
-
-        // Do not add to method spec
-        buildWithDTOOptionalParam(typeSpec, methodSpec, executable, params, returnType, parameterSpec);
-    }
-
-    protected abstract void buildWithDTOOptionalParam(TypeSpec.Builder typeSpec, MethodSpec.Builder methodSpec, AbstractExecutable executable, List<WritableParameter> params, TypeName returnType, ParameterSpec parameterSpec);
 
 
-
-    protected AnnotationSpec generateNativeAnnotationSpec(AbstractExecutable executable){
+    protected AnnotationSpec generateNativeAnnotationSpec(CombinedExecutableDTO executable){
         AnnotationSpec.Builder annotationSpec = AnnotationSpec.builder(JavaTypeMapping.NativeExecutable_class)
-                .addMember("name", "$S", executable.identifier())
-                .addMember("returns", "$S", executable.nativeReturnType());
+                .addMember("name", "$S", executable.nativeName())
+                .addMember("returns", "$S", executable.getResult().getNativeType());
 
-        for (Parameter parameter : executable.getParameters()) {
-            annotationSpec.addMember("parameters", "@$T(value = $S, type = $S)", NativeParameter_class, parameter.getName(), parameter.getNativeType());
+        for (IntrospectedArgumentDTO parameter : executable.getCallParameters()) {
+            annotationSpec.addMember("parameters", "@$T(value = $S, type = $S)", NativeParameter_class, parameter.getName(), parameter.getType());
         }
         return annotationSpec.build();
     }
@@ -235,13 +182,13 @@ public abstract class OperationGenerator<A extends OperationGenerator.OperationG
 
 
     public static class OperationGeneratorContext {
-        private final List<AbstractExecutable> executables;
+        private final List<CombinedExecutableDTO> executables;
 
-        public OperationGeneratorContext(List<AbstractExecutable> executables) {
+        public OperationGeneratorContext(List<CombinedExecutableDTO> executables) {
             this.executables = executables;
         }
 
-        public List<AbstractExecutable> getExecutables() {
+        public List<CombinedExecutableDTO> getExecutables() {
             return executables;
         }
     }

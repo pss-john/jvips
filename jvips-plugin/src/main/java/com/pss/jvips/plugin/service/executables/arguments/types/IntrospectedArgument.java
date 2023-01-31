@@ -15,4 +15,6 @@ public interface IntrospectedArgument {
         return Optional.ofNullable(getDocumentation());
     }
 
+    boolean isDocumentationParsed();
+
 }
